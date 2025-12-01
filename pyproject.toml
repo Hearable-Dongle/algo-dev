@@ -33,14 +33,15 @@ authors = [
     {name = "tyler", email = "tyler.bell@rogers.com"},
 ]
 dependencies = [
-    "numpy >= 2.2.6",
     "hatch >= 1.14.1",
-    "ruff >= 0.11.5",
+    "librosa >= 0.11.0",
+    "matplotlib >= 3.10.7",
+    "mpl-tools >= 0.4.1",
+    "numpy >= 2.2.6",
     "pyright >= 1.1.399",
     "pyroomacoustics >= 0.8.6",
-    "librosa >= 0.11.0",
-    "mpl-tools >= 0.4.1",
-    "matplotlib >= 3.10.7"
+    "ruff >= 0.11.5",
+    "torch >= 2.9.0",
 ]
 
 [project.scripts]
