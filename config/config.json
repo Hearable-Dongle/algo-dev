@@ -1,0 +1,22 @@
+{
+    "seed": 42,
+    "input_dir": "input",
+    "output_dir": "output",
+    "training": {
+        "max_sessions": 0,
+        "batch_size": 32
+    },
+    "validation": {
+        "max_sessions": 0,
+        "batch_size": 32
+    },
+    "optimizer": {
+        "lr": 3e-4
+    },
+    "scheduler": {
+        "mode": "min",
+        "factor": 0.5,
+        "patience": 3
+    },
+    "epoch_count": 50
+}
