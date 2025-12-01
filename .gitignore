@@ -1,0 +1,18 @@
+# ---- Directories ----
+# Build Artifacts
+**/cache/*
+**/dep/*
+*.egg-info/*
+**/__pycache__/*
+**/bin/*
+
+# VSCode Artifacts
+**/.vscode/*
+
+# Data Artifacts
+**/input/*
+**/output/*
+
+# ---- File Extensions ----
+# Build Artifacts
+*.log
