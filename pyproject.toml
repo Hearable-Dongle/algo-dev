@@ -1,0 +1,178 @@
+########################################    Build System    ########################################
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+########################################    Hatch Backend   ########################################
+
+[tool.hatch.build]
+packages = [
+    "utils",
+    "cli",
+]
+artifacts = [
+  "*.py",
+]
+sources = {"" = ""}
+
+[tool.hatch.build.targets.sdist]
+directory = "bin/sdist"
+
+[tool.hatch.build.targets.wheel]
+directory = "bin/whl"
+
+########################################   Project Config   ########################################
+
+[project]
+name = "vocalpoint_algo_dev"
+version = "0.1.0"
+requires-python = ">=3.13"
+description = ""
+authors = [
+    {name = "tyler", email = "tyler.bell@rogers.com"},
+]
+dependencies = [
+    "numpy >= 2.2.6",
+    "hatch >= 1.14.1",
+    "ruff >= 0.11.5",
+    "pyright >= 1.1.399",
+    "pyroomacoustics >= 0.8.6",
+    "librosa >= 0.11.0",
+    "mpl-tools >= 0.4.1",
+    "matplotlib >= 3.10.7"
+]
+
+[project.scripts]
+"algo" = "cli.cli:main"
+
+########################################   UV Installation  ########################################
+
+[tool.uv.sources]
+syde_577_ws = {workspace = true}
+
+[tool.uv.workspace]
+members = [
+    ".",
+]
+
+########################################     Ruff Linter    ########################################
+
+[tool.ruff]
+cache-dir = "bin/lint"
+fix = true
+exclude = [
+    ".venv",
+    "bin",
+    "data",
+]
+indent-width = 4
+line-length = 100
+namespace-packages = [
+    "util",
+    "cli",
+]
+output-format = "full"
+preview = true
+required-version = ">=0.4.5"
+respect-gitignore = false
+target-version = "py313"
+
+[tool.ruff.format]
+docstring-code-format = true
+docstring-code-line-length = 100
+indent-style = "space"
+line-ending = "lf"
+preview = true
+quote-style = "double"
+skip-magic-trailing-comma = false
+
+[tool.ruff.lint]
+extend-select = [
+    "ERA",
+    "YTT",
+    "ANN",
+    "ASYNC",
+    "S",
+    "BLE",
+    "FBT",
+    "B",
+    "A",
+    "COM",
+    "C4",
+    "T10",
+    "EM",
+    "EXE",
+    "FIX",
+    "FA",
+    "INT",
+    "ISC",
+    "ICN",
+    "LOG",
+    "G",
+    "INP",
+    "PIE",
+    "T20",
+    "PYI",
+    "PT",
+    "Q",
+    "RSE",
+    "RET",
+    "SLF",
+    "SIM",
+    "SLOT",
+    "TID",
+    "TC",
+    "ARG",
+    "PTH",
+    "I",
+    "NPY",
+    "N",
+    "PERF",
+    "E",
+    "W",
+    "DOC",
+#    "D",
+    "F",
+    "PGH",
+    "PL",
+    "UP",
+    "FURB",
+    "RUF",
+    "TRY",
+]
+ignore = [
+    "COM812",
+    "CPY",
+    "D203",
+    "D213",
+]
+preview = true
+
+
+########################################   Pyright Checker  ########################################
+
+[tool.pyright]
+exclude = [
+    ".venv",
+    "bin",
+    "data",
+]
+venvPath = "."
+venv = ".venv"
+verboseOutput = true
+pythonVersion = "3.13"
+pythonPlatform = "All"
+
+useLibraryCodeForTypes = true
+strictListInference = true
+strictDictionaryInference = true
+strictSetInference = true
+analyzeUnannotatedFunctions = true
+strictParameterNoneValue = true
+enableTypeIgnoreComments = true
+deprecateTypingAliases = true
+enableReachabilityAnalysis = true
+enableExperimentalFeatures = false
+typeCheckingMode = "strict"
+reportMissingTypeStubs = false
