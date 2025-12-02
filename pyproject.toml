@@ -17,10 +17,10 @@ artifacts = [
 sources = {"" = ""}
 
 [tool.hatch.build.targets.sdist]
-directory = "bin/sdist"
+directory = "output/sdist"
 
 [tool.hatch.build.targets.wheel]
-directory = "bin/whl"
+directory = "output/whl"
 
 ########################################   Project Config   ########################################
 
@@ -60,12 +60,13 @@ members = [
 ########################################     Ruff Linter    ########################################
 
 [tool.ruff]
-cache-dir = "bin/lint"
+cache-dir = "output/lint"
 fix = true
 exclude = [
     ".venv",
-    "bin",
-    "data",
+    "input",
+    "output",
+    "util/record.py",
 ]
 indent-width = 4
 line-length = 100
@@ -156,8 +157,9 @@ preview = true
 [tool.pyright]
 exclude = [
     ".venv",
-    "bin",
-    "data",
+    "input",
+    "output",
+    "util/record.py",
 ]
 venvPath = "."
 venv = ".venv"
