@@ -1,4 +1,5 @@
 import atexit
+import dataclasses
 import json
 import logging
 import random
@@ -10,6 +11,17 @@ from typing import Any
 import numpy as np
 import torch
 from numpy.random import Generator
+from numpy.typing import NDArray
+
+
+@dataclasses.dataclass
+class Audio_Sources:
+    input: Path | str
+    loc: list[float]
+    classification: str
+
+    def resolve_input(self, project_dir: Path) -> None:
+        self.input = project_dir / "input" / "audio" / self.input
 
 
 class Config:
@@ -85,6 +97,11 @@ class Config:
         return self.__device
 
     @property
+    def sound_speed(self) -> float:
+        # Return speed of sound
+        return self.__project_config["sound_speed"]
+
+    @property
     def input_dir(self) -> Path:
         # Return input directory path
         return Path(self.__project_dir, self.__project_config["input_dir"]).resolve()
@@ -149,6 +166,63 @@ class Config:
     def epoch_count(self) -> int:
         # Return epoch count
         return self.__project_config["epoch_count"]
+
+    @property
+    def fs(self) -> int:
+        # Return sampling frequency
+        return self.__project_config["sampling_frequency"]
+
+    @property
+    def room_dim(self) -> NDArray[np.float64]:
+        # Return room dimensions
+        return np.array(
+            list(self.__project_config["room_settings"]["dim"].values()), dtype=np.float64
+        )
+
+    @property
+    def reflection_count(self) -> int:
+        # Return room reflection count
+        return self.__project_config["room_settings"]["reflection_count"]
+
+    @property
+    def mic_count(self) -> int:
+        # Return number of microphones
+        return self.__project_config["mic_settings"]["count"]
+
+    @property
+    def mic_spacing(self) -> float:
+        # Return spacing between microphones
+        return self.__project_config["mic_settings"]["spacing"]
+
+    @property
+    def mic_loc(self) -> NDArray[np.float64]:
+        # Return location of microphones
+        return np.array(self.__project_config["mic_settings"]["loc"], dtype=np.float64)
+
+    @property
+    def mic_type(self) -> str:
+        # Return type of microphones
+        return self.__project_config["mic_settings"]["type"]
+
+    @property
+    def sources(self) -> list[Audio_Sources]:
+        # Concatenate list of sources
+        sources = [Audio_Sources(**source) for source in self.__project_config["sources"]]
+        for source in sources:
+            source.resolve_input(self.__project_dir)
+
+        # Return list of sources
+        return sources
+
+    @property
+    def pc_count(self) -> int:
+        # Return number of principal components
+        return self.__project_config["principal_component_count"]
+
+    @property
+    def frame_duration(self) -> float:
+        # Return audio frame duration in milliseconds
+        return self.__project_config["frame_duration"]
 
     def close(self) -> None:
         # delete package logger and close package log
