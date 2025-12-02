@@ -20,7 +20,7 @@ def calc_snr(ref: NDArray[Any], out: NDArray[Any]) -> float:
     noise = ref - out
 
     # Compute and return signal to noise ratio in dB
-    return 10 * np.log10(np.sum(ref ** 2) / np.sum(noise ** 2))
+    return 10 * np.log10(np.sum(ref**2) / np.sum(noise**2))
 
 
 def calc_si_sdr(ref: NDArray[Any], out: NDArray[Any]) -> float:
@@ -37,5 +37,5 @@ def calc_si_sdr(ref: NDArray[Any], out: NDArray[Any]) -> float:
     # Determine noise in AC output audio by subtracting AC reference audio
     out_noise = out_ac - s_target
 
-    # Compute and return scale invariant signal to distortion ratio ratio in dB
-    return 10 * np.log10(np.sum(s_target ** 2) / np.sum(out_noise ** 2))
+    # Compute and return scale invariant signal to distortion ratio in dB
+    return 10 * np.log10(np.sum(s_target**2) / np.sum(out_noise**2))
