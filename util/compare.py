@@ -12,7 +12,7 @@ def calc_rmse(ref: NDArray[Any], out: NDArray[Any]) -> tuple[float, float]:
     rmse = np.sqrt(mse)
 
     #  Return both error metrics
-    return (mse, rmse)
+    return (rmse, mse)
 
 
 def calc_snr(ref: NDArray[Any], out: NDArray[Any]) -> float:
