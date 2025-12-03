@@ -7,7 +7,7 @@ from numpy.typing import NDArray
 from .configure import Audio_Sources
 
 
-def plot_mic_pos(mic_pos: NDArray[np.float64], output_dir: Path):
+def plot_mic_pos(mic_pos: NDArray[np.float64], output_dir: Path) -> None:
 
     # Determine x and y positions of microphones
     x = mic_pos[0, :]
@@ -29,8 +29,8 @@ def plot_mic_pos(mic_pos: NDArray[np.float64], output_dir: Path):
     for mic in range(mic_count):
         # Add channel index with small offset to prevent overlap with microphone marker
         ax.text(  # type: ignore[reportUnknownMemberType]
-            x[mic] + 0.02,
-            y[mic] + 0.02,
+            x[mic] + 0.005,
+            y[mic],
             f"{mic}",
             fontsize=10,
             color="black",
@@ -144,6 +144,37 @@ def plot_room_pos(
 
     # Save plot to file
     plt.savefig(image_dir / "room_layout.png")  # type: ignore[reportUnknownMemberType]
+
+    # Close plot to prevent display
+    plt.close()
+
+def plot_history(data: dict[str, list[np.float64]], output_dir: Path) -> None:
+
+    # Create figure
+    plt.figure()  # type: ignore[reportUnknownMemberType]
+
+    # Iterate through data
+    for label, history in data.items():
+        # Plot history
+        plt.semilogy(history, label=label)  # type: ignore[reportUnknownMemberType]
+    
+    # Set axis labels
+    plt.xlabel("Iteration")  # type: ignore[reportUnknownMemberType]
+    plt.ylabel("Noise Power")  # type: ignore[reportUnknownMemberType]
+
+    # Enable plot grid
+    plt.grid(True)  # type: ignore[reportUnknownMemberType]
+
+    # Add legend to figure
+    plt.legend()  # type: ignore[reportUnknownMemberType]
+
+    # Create image directory if it does not exist
+    image_dir = output_dir / "images"
+    if not image_dir.exists():
+        image_dir.mkdir(parents=True)
+
+    # Save plot to file
+    plt.savefig(image_dir / "convergence.png")  # type: ignore[reportUnknownMemberType]
 
     # Close plot to prevent display
     plt.close()
