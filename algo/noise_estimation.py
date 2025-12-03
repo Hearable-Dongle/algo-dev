@@ -2,7 +2,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 
-def est_Rnn(noise_seg: NDArray[np.float64]):
+def estimate_Rnn(noise_seg: NDArray[np.float64]):
     # Compute sample covariance matrix of noise across microphones
     Rnn = noise_seg.T @ noise_seg / noise_seg.shape[0]
 
@@ -10,7 +10,7 @@ def est_Rnn(noise_seg: NDArray[np.float64]):
     return 0.5 * (Rnn + Rnn.T)
 
 
-def reduce_Rnn_pca(Rnn: NDArray[np.float64], component_count: int):
+def reduce_Rnn(Rnn: NDArray[np.float64], component_count: int):
     # Compute eigen-decomposition of symmetric (eigh instead of eig) noise covariance matrix
     eigvals, eigvecs = np.linalg.eigh(Rnn)
 
@@ -30,3 +30,11 @@ def reduce_Rnn_pca(Rnn: NDArray[np.float64], component_count: int):
 
     # Symmetrize approximate covariance matrix and return matrix
     return 0.5 * (Rnn_reduced + Rnn_reduced.T)
+
+
+def regularize_Rnn(Rnn: NDArray[np.float64], reg_factor: float):
+    # Regularize covariance matrix of noise
+    Rnn_reg = Rnn + reg_factor * np.eye(Rnn.shape[0], dtype=Rnn.dtype)
+
+    # Symmetrize covariance matrix and return matrix
+    return 0.5 * (Rnn_reg + Rnn_reg.T)
