@@ -78,7 +78,7 @@ def wng_mvdr_newton(
     NDArray[np.complex128]
         Optimized beamformer weight vector (M x 1)
     """
-    
+
     # Create distortionless beamformer weights in steering vector direction
     weight_vec = steering_vec / (steering_vec.conj().T @ steering_vec)
 

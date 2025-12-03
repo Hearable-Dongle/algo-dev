@@ -47,7 +47,7 @@ def plot_mic_pos(mic_pos: NDArray[np.float64], output_dir: Path) -> None:
     ax.set_title("Microphone Layout (2D Top-Down View)")  # type: ignore[reportUnknownMemberType]
 
     # Turn on figure grid
-    plt.grid(True)  # type: ignore[reportUnknownMemberType]
+    plt.grid(visible=True)  # type: ignore[reportUnknownMemberType]
 
     # Create image directory if it does not exist
     image_dir = output_dir / "images"
@@ -164,7 +164,7 @@ def plot_history(data: dict[str, list[np.float64]], output_dir: Path) -> None:
     plt.ylabel("Noise Power")  # type: ignore[reportUnknownMemberType]
 
     # Enable plot grid
-    plt.grid(True)  # type: ignore[reportUnknownMemberType]
+    plt.grid(visible=True)  # type: ignore[reportUnknownMemberType]
 
     # Add legend to figure
     plt.legend()  # type: ignore[reportUnknownMemberType]
@@ -218,7 +218,7 @@ def plot_beam_pattern(
         pattern[angle_idx] = np.conj(weights) @ steering_vec
 
     # Normalize to 0 dB max
-    pattern_dB = 20 * np.log10(np.abs(pattern) / np.max(np.abs(pattern)))
+    pattern_db = 20 * np.log10(np.abs(pattern) / np.max(np.abs(pattern)))
 
     # Create figure
     plt.figure()  # type: ignore[reportUnknownMemberType]
@@ -227,7 +227,7 @@ def plot_beam_pattern(
     ax = plt.subplot(111, projection="polar")  # type: ignore[reportUnknownMemberType]
 
     # Plot pattern
-    ax.plot(angles, pattern_dB)  # type: ignore[reportUnknownMemberType]
+    ax.plot(angles, pattern_db)  # type: ignore[reportUnknownMemberType]
 
     # Set rim on -40 dB polar coordinates
     ax.set_rlim(-40, 0)  # type: ignore[reportUnknownMemberType]
