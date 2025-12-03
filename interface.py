@@ -4,12 +4,12 @@ import soundfile as sf
 from numpy.typing import NDArray
 from scipy.signal import istft, stft  # type: ignore[reportUnknownMemberType]
 
-from algo.beamformer import apply_beamformer_stft, wng_mvdr_steepest, wng_mvdr_newton
+from algo.beamformer import apply_beamformer_stft, wng_mvdr_newton, wng_mvdr_steepest
 from algo.noise_estimation import estimate_Rnn, reduce_Rnn, regularize_Rnn
 from util.compare import calc_rmse, calc_si_sdr, calc_snr
 from util.configure import Config
-from util.simulate import Mic_Type, sim_mic, sim_room
-from util.visualize import plot_history, plot_mic_pos, plot_room_pos
+from util.simulate import MicType, sim_mic, sim_room
+from util.visualize import plot_beam_pattern, plot_history, plot_mic_pos, plot_room_pos
 
 # Define configuration
 config = Config()
@@ -22,7 +22,7 @@ mic, mic_pos = sim_mic(
     config.mic_count,
     config.mic_loc,
     config.mic_spacing,
-    getattr(Mic_Type, config.mic_type.upper()),
+    getattr(MicType, config.mic_type.upper()),
     config.fs,
 )
 
@@ -52,8 +52,7 @@ for source in config.sources:
     source_audio, fs = librosa.load(source.input, sr=config.fs)
 
     # Update minimum audio source duration
-    if len(source_audio) < min_sample_count:
-        min_sample_count = len(source_audio)
+    min_sample_count = min(min_sample_count, len(source_audio))
 
     # Verify sampling rate is correct
     if fs != config.fs:
@@ -181,7 +180,7 @@ for freq_idx, freq in enumerate(fvec):  # type: ignore[reportUnknownMemberType]
 gamma_dB = 15
 gamma = 10 ** (gamma_dB / 10)
 mu = 0.01
-Kiter = 20
+iteration_count = 20
 
 # Initialize list for storing noise power history
 power_history_steepest: list[NDArray[np.float64]] = list()
@@ -191,7 +190,7 @@ power_history_newton: list[NDArray[np.float64]] = list()
 weights_steepest = np.zeros((freq_bin_count, config.mic_count), dtype=complex)
 for kf in range(freq_bin_count):
     a = steering_vec[kf, :].reshape(-1, 1)
-    freq_bin_weights, freq_bin_power_history = wng_mvdr_steepest(Rnn, a, gamma, mu, Kiter)
+    freq_bin_weights, freq_bin_power_history = wng_mvdr_steepest(Rnn, a, gamma, mu, iteration_count)
     weights_steepest[kf, :] = freq_bin_weights[:, 0]
 
     # Append power history
@@ -201,21 +200,44 @@ for kf in range(freq_bin_count):
 weights_newton = np.zeros((freq_bin_count, config.mic_count), dtype=complex)
 for kf in range(freq_bin_count):
     a = steering_vec[kf, :].reshape(-1, 1)
-    freq_bin_weights, freq_bin_power_history = wng_mvdr_newton(Rnn, a, gamma, mu, Kiter)
+    freq_bin_weights, freq_bin_power_history = wng_mvdr_newton(Rnn, a, gamma, mu, iteration_count)
     weights_newton[kf, :] = freq_bin_weights[:, 0]
 
     # Append power history
     power_history_newton.append(freq_bin_power_history)
 
 # Plot convergence history
-plot_history({
-    "Steepest Descent": power_history_steepest[0],
-    "Newton": power_history_newton[0],
-}, config.output_dir)
+plot_history(
+    {
+        "Steepest Descent": np.mean(np.asarray(power_history_steepest), axis=0),
+        "Newton": np.mean(np.asarray(power_history_newton), axis=0),
+    },
+    config.output_dir,
+)
 
 # Apply beamformer
 freq_steepest = apply_beamformer_stft(stft_output, weights_steepest)
 freq_newton = apply_beamformer_stft(stft_output, weights_newton)
+
+# Plot beam pattern
+target_freq = 4400.0
+bin_idx = int(np.argmin(np.abs(fvec - target_freq)))  # type: ignore[reportUnknownMemberType]
+plot_beam_pattern(
+    "beam_pattern_steepest",
+    weights_steepest[bin_idx, :],
+    mic_pos,
+    fvec[bin_idx],  # type: ignore[reportUnknownMemberType]
+    config.sound_speed,
+    config.output_dir,
+)
+plot_beam_pattern(
+    "beam_pattern_newton",
+    weights_newton[bin_idx, :],
+    mic_pos,
+    fvec[bin_idx],  # type: ignore[reportUnknownMemberType]
+    config.sound_speed,
+    config.output_dir,
+)
 
 # Apply Inverse STFT
 _, time_steepest = istft(  # type: ignore[reportUnknownMemberType]

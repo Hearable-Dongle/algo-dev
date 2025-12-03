@@ -148,6 +148,7 @@ def plot_room_pos(
     # Close plot to prevent display
     plt.close()
 
+
 def plot_history(data: dict[str, list[np.float64]], output_dir: Path) -> None:
 
     # Create figure
@@ -157,7 +158,7 @@ def plot_history(data: dict[str, list[np.float64]], output_dir: Path) -> None:
     for label, history in data.items():
         # Plot history
         plt.semilogy(history, label=label)  # type: ignore[reportUnknownMemberType]
-    
+
     # Set axis labels
     plt.xlabel("Iteration")  # type: ignore[reportUnknownMemberType]
     plt.ylabel("Noise Power")  # type: ignore[reportUnknownMemberType]
@@ -175,6 +176,69 @@ def plot_history(data: dict[str, list[np.float64]], output_dir: Path) -> None:
 
     # Save plot to file
     plt.savefig(image_dir / "convergence.png")  # type: ignore[reportUnknownMemberType]
+
+    # Close plot to prevent display
+    plt.close()
+
+
+def plot_beam_pattern(
+    name: str,
+    weights: NDArray[np.complex128],
+    mic_pos: NDArray[np.float64],
+    freq: float,
+    sound_speed: float,
+    output_dir: Path,
+    angle_count: int = 360,
+) -> None:
+    # Determine x and ymicrophone positions
+    pos = mic_pos.T
+    pos_xy = pos[:, :2]
+
+    # Determine wave number
+    k = 2.0 * np.pi * freq / sound_speed
+
+    # Compute individual angles
+    angles = np.linspace(0, 2 * np.pi, angle_count, endpoint=False)
+
+    # Initialize pattern
+    pattern = np.zeros(angle_count, dtype=np.complex128)
+
+    # Iterate through angles
+    for angle_idx, angle in enumerate(angles):
+        # Compute unit direction vector in the horizontal plane
+        direction = np.array([np.cos(angle), np.sin(angle)])
+
+        # Get plane-wave phase at each mic
+        phase = -1j * k * (pos_xy @ direction)
+
+        # Create steering vector for look direction
+        steering_vec = np.exp(phase)
+
+        # Compute array response to steering vector
+        pattern[angle_idx] = np.conj(weights) @ steering_vec
+
+    # Normalize to 0 dB max
+    pattern_dB = 20 * np.log10(np.abs(pattern) / np.max(np.abs(pattern)))
+
+    # Create figure
+    plt.figure()  # type: ignore[reportUnknownMemberType]
+
+    # Add 2D polar subplot with one row and one column
+    ax = plt.subplot(111, projection="polar")  # type: ignore[reportUnknownMemberType]
+
+    # Plot pattern
+    ax.plot(angles, pattern_dB)  # type: ignore[reportUnknownMemberType]
+
+    # Set rim on -40 dB polar coordinates
+    ax.set_rlim(-40, 0)  # type: ignore[reportUnknownMemberType]
+
+    # Create image directory if it does not exist
+    image_dir = output_dir / "images"
+    if not image_dir.exists():
+        image_dir.mkdir(parents=True)
+
+    # Save plot to file
+    plt.savefig(image_dir / f"{name}.png")  # type: ignore[reportUnknownMemberType]
 
     # Close plot to prevent display
     plt.close()
