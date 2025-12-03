@@ -218,7 +218,7 @@ class Config:
     def noise_pc_count(self) -> int:
         # Return number of principal components to reduce noise
         return self.__project_config["noise_pc_count"]
-    
+
     @property
     def noise_reg_factor(self) -> float:
         # Return noise regularization factor

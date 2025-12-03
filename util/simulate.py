@@ -5,7 +5,7 @@ import pyroomacoustics as pra
 from numpy.typing import NDArray
 
 
-class Mic_Type(Enum):
+class MicType(Enum):
     CIRCULAR = 0
     LINEAR = 1
     PLANAR = 2
@@ -15,12 +15,12 @@ def sim_mic(
     mic_count: int,
     mic_loc: np.ndarray,
     mic_spacing: float,
-    mic_type: Mic_Type = Mic_Type.CIRCULAR,
+    mic_type: MicType = MicType.CIRCULAR,
     mic_fs: int = 16000,
 ) -> tuple[pra.MicrophoneArray, NDArray[np.float64]]:
 
     match mic_type:
-        case Mic_Type.CIRCULAR:
+        case MicType.CIRCULAR:
             # Define mic positions for circular array in xy-plane
             angles = np.linspace(0, 2 * np.pi, mic_count, endpoint=False)
             mic_pos = np.array([
@@ -29,14 +29,14 @@ def sim_mic(
                 np.zeros(mic_count),
             ])
 
-        case Mic_Type.LINEAR:
+        case MicType.LINEAR:
             # Define mic positions for linear array along x-axis
             mic_pos = np.array([
                 [i * mic_spacing - (mic_count - 1) * mic_spacing / 2, 0, 0]
                 for i in range(mic_count)
             ]).T
 
-        case Mic_Type.PLANAR:
+        case MicType.PLANAR:
             # Define mic positions for planar array in xy-plane
             num_mics_side = int(np.sqrt(mic_count))
             x_coords = np.linspace(
