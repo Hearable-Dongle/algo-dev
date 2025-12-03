@@ -47,6 +47,7 @@
             "classification": "noise"
         }
     ],
-    "principal_component_count": 4,
+    "noise_pc_count": 4,
+    "noise_reg_factor": 1e-8,
     "frame_duration": 10
 }
